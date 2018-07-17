@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ServiceLayer.CloudStorageProviders
 {
-    internal class OneDriveAPI
+    public class OneDriveAPI
     {
         // Fields
         private static string clientId = "1826dd27-ce57-42eb-a4df-441e00a4ff8f";

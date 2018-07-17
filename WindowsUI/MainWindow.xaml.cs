@@ -1,6 +1,6 @@
-﻿using ServiceLayer.BusinessEntities;
-using ServiceLayer.CloudStorageProviders;
-using ServiceLayer.Services;
+﻿using BusinessLogicLayer.BusinessEntities;
+using BusinessLogicLayer.Services;
+using ByteSizeLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,14 +27,17 @@ namespace WindowsUI
         private FileStorageService fileStorageService;
 
         // Private methods
-        private void GenerateTreeViewItems(List<IFileSystemEntity> list)
+        private List<TreeViewItem> GenerateTreeViewItems(List<IFileSystemEntity> list)
         {
             var itemsList = new List<TreeViewItem>();
             foreach (IFileSystemEntity fileSystemEntity in list)
             {
                 TreeViewItem treeViewItem = new TreeViewItem();
-                treeViewItem.Header = fileSystemEntity.Name + " (" +
+                treeViewItem.Header = fileSystemEntity.Name + " - " + ByteSize.FromBytes((double)fileSystemEntity.Size);
+                itemsList.Add(treeViewItem);
             }
+
+            return itemsList;
         }
 
         // Constructor
@@ -51,11 +54,17 @@ namespace WindowsUI
 
             // Disable and clear controls
             LoginButton.IsEnabled = false;
-            var x = Treeview.Items[0]; // Clear();
-
+            Treeview.Items.Clear(); // Clear();
+            //Treeview.Visibility = Visibility.Visible;
 
             // Get data from cloud and load into TreeView
-            await this.fileStorageService.GetFileStorageRootFolder();
+            var fileSystemEntities = await this.fileStorageService.GetFileStorageRootFolder();
+            var treeViewItems = this.GenerateTreeViewItems(fileSystemEntities);
+            treeViewItems.ForEach(item =>
+            {
+                Treeview.Items.Add(item);
+            });
+            treeViewItems.Reverse();
 
         }
     }

@@ -81,12 +81,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BusinessEntities\File.cs" />
-    <Compile Include="BusinessEntities\Folder.cs" />
-    <Compile Include="BusinessEntities\IFileSystemEntity.cs" />
     <Compile Include="CloudStorageProviders\OneDriveAPI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\FileStorageService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
