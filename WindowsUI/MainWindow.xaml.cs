@@ -1,4 +1,5 @@
-﻿using ServiceLayer.CloudStorageProviders;
+﻿using ServiceLayer.BusinessEntities;
+using ServiceLayer.CloudStorageProviders;
 using ServiceLayer.Services;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,17 @@ namespace WindowsUI
         // Fields
         private FileStorageService fileStorageService;
 
+        // Private methods
+        private void GenerateTreeViewItems(List<IFileSystemEntity> list)
+        {
+            var itemsList = new List<TreeViewItem>();
+            foreach (IFileSystemEntity fileSystemEntity in list)
+            {
+                TreeViewItem treeViewItem = new TreeViewItem();
+                treeViewItem.Header = fileSystemEntity.Name + " (" +
+            }
+        }
+
         // Constructor
         public MainWindow()
         {
@@ -36,22 +48,15 @@ namespace WindowsUI
         // Event handlers
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            bool loginSuccessful = false;
 
+            // Disable and clear controls
+            LoginButton.IsEnabled = false;
+            var x = Treeview.Items[0]; // Clear();
+
+
+            // Get data from cloud and load into TreeView
             await this.fileStorageService.GetFileStorageRootFolder();
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show("Log in failed. Please try again " + "(" + ex.Message + ")");
-            //}
 
-            if (loginSuccessful)
-            {
-                MainWindow main = new MainWindow();
-                App.Current.MainWindow = main;
-                this.Close();
-                main.Show();
-            }
         }
     }
 }

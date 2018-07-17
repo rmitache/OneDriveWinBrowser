@@ -9,5 +9,6 @@ namespace ServiceLayer.BusinessEntities
     public class File: IFileSystemEntity
     {
         public string Name { get; set; }
+        public long? Size { get; set; }
     }
 }

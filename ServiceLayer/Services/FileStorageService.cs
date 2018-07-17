@@ -28,16 +28,20 @@ namespace ServiceLayer.Services
                         {
                             newNode = new Folder
                             {
-                                Name = obj.Name
+                                Name = obj.Name,
+                                Size = obj.Size
+                           
                             };
                         }
                         else
                         {
                             newNode = new File
                             {
-                                Name = obj.Name
+                                Name = obj.Name,
+                                Size = obj.Size
                             };
                         }
+                        
 
                         list.Add(newNode);
                     }
