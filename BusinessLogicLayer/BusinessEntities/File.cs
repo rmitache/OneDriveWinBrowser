@@ -10,6 +10,7 @@ namespace BusinessLogicLayer.BusinessEntities
     public class File : IFileSystemEntity
     {
         // Properties
+        public string ID { get; set; }
         public string Name { get; set; }
         public long? Size { get; set; }
 
@@ -41,17 +42,23 @@ namespace BusinessLogicLayer.BusinessEntities
                 return list;
             }
         }
-        public IFileSystemEntityType EntityType { get
+        public IFileSystemEntityType EntityType
+        {
+            get
             {
                 return IFileSystemEntityType.File;
             }
         }
+        public Folder ParentFolder { get; set; }
 
         // Constructor
-        public File(string name, long? size)
+        public File(string id, string name, long? size, Folder parentFolder)
         {
+            this.ID = id;
             this.Name = name;
             this.Size = size;
+
+            this.ParentFolder = parentFolder;
         }
     }
 }

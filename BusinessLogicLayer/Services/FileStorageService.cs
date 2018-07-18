@@ -18,27 +18,26 @@ namespace BusinessLogicLayer.Services
         // Private methods
         private void RequestAndGenerateChildrenEntitiesRecursively(BusinessEntities.Folder parentFolder, DriveItem expandedFolderDriveItem)
         {
-
             // Generate entities for its children
             foreach (var childDriveItem in expandedFolderDriveItem.Children.CurrentPage)
             {
                 // Folder
                 if (childDriveItem.Folder != null)
                 {
-                    var newChildFolder = new BusinessEntities.Folder(childDriveItem.Name, childDriveItem.Size);
+                    var newChildFolder = new BusinessEntities.Folder(childDriveItem.Id, childDriveItem.Name, childDriveItem.Size, parentFolder);
                     parentFolder.Folders.Add(newChildFolder);
 
                     // Generate its children when it is a Folder
                     if (expandedFolderDriveItem.Children != null && expandedFolderDriveItem.Children.CurrentPage != null)
                     {
-                        var expandedChildDriveItem = oneDriveAPI.GetExpandedDriveItem(childDriveItem.Id);
+                        var expandedChildDriveItem = oneDriveAPI.GetDriveItem(childDriveItem.Id);
                         RequestAndGenerateChildrenEntitiesRecursively(newChildFolder, expandedChildDriveItem);
                     }
                 }
                 // File
                 else if (childDriveItem.File != null)
                 {
-                    var newFile = new BusinessEntities.File(childDriveItem.Name, childDriveItem.Size);
+                    var newFile = new BusinessEntities.File(childDriveItem.Id, childDriveItem.Name, childDriveItem.Size, parentFolder);
                     parentFolder.Files.Add(newFile);
                 }
             }
@@ -54,12 +53,37 @@ namespace BusinessLogicLayer.Services
         public async Task<BusinessEntities.Folder> GetRootFolderWithDescendants()
         {
             //
-            var rootFolder = new BusinessEntities.Folder("Root", 0);
+
             var rootDriveItem = await oneDriveAPI.GetRootFolderAsync();
+            var rootFolder = new BusinessEntities.Folder(rootDriveItem.Id, "Root", rootDriveItem.Size, null);
             this.RequestAndGenerateChildrenEntitiesRecursively(rootFolder, rootDriveItem);
 
 
             return rootFolder;
+        }
+        public async Task<BusinessEntities.File> UploadFile(BusinessEntities.Folder targetFolder,string fileNameWithExtension, System.IO.Stream fileStream)
+        {
+            // Get the targetFolder driveItem and the destination path (strip /drive/root: (12 characters) from the parent path string)
+            var targetFolderDriveItem = this.oneDriveAPI.GetDriveItem(targetFolder.ID);
+            string destinationFolderPath = targetFolderDriveItem.ParentReference == null
+                ? ""
+                : targetFolderDriveItem.ParentReference.Path.Remove(0, 12) + "/" + Uri.EscapeUriString(targetFolderDriveItem.Name);
+            var uploadPath = destinationFolderPath + "/" + fileNameWithExtension;
+
+
+            // Attempt to upload the file 
+            BusinessEntities.File uploadedFile = null;
+            try
+            {
+                var uploadedItem = await this.oneDriveAPI.UploadDriveItemAsync(uploadPath, fileStream);
+                uploadedFile = new BusinessEntities.File(uploadedItem.Id, uploadedItem.Name, uploadedItem.Size, null);
+            }
+            catch (Exception exception)
+            {
+                throw new Exception(exception.Message);
+            }
+
+            return uploadedFile;
         }
     }
 

@@ -10,11 +10,11 @@ namespace BusinessLogicLayer.BusinessEntities
     public class Folder : IFileSystemEntity
     {
         // Properties
+        public string ID { get; }
         public string Name { get; set; }
         public long? Size { get; set; }
         public List<File> Files { get; set; }
         public List<Folder> Folders { get; set; }
-
 
         // IFileSystemEntity implementation
         public string TypeName
@@ -53,15 +53,21 @@ namespace BusinessLogicLayer.BusinessEntities
                 return IFileSystemEntityType.Folder;
             }
         }
+        public Folder ParentFolder { get; set; }
 
         // Constructor
-        public Folder(string name, long? size = null)
+        public Folder(string id, string name, long? size, Folder parentFolder)
         {
+            this.ID = id;
             this.Name = name;
             this.Size = size;
 
             this.Files = new List<File>();
             this.Folders = new List<Folder>();
+
+            this.ParentFolder = parentFolder;
         }
+
+        
     }
 }

@@ -67,10 +67,23 @@ namespace ServiceLayer.CloudStorageProviders
 
 
         // Public methods
-        public DriveItem GetExpandedDriveItem(string id)
+        public async Task<DriveItem> UploadDriveItemAsync(string uploadPath, System.IO.Stream fileStream)
+        {
+            var uploadedItem = await graphClient.Drive.Root.ItemWithPath(uploadPath).Content.Request().PutAsync<DriveItem>(fileStream);
+            return uploadedItem;
+        }
+        public DriveItem GetDriveItem(string id, bool expandChildren = true)
         {
             Task<DriveItem> task;
-            task = this.graphClient.Drive.Items[id].Request().Expand("children").GetAsync();
+            if (expandChildren)
+            {
+                task = this.graphClient.Drive.Items[id].Request().Expand("children").GetAsync();
+            }
+            else
+            {
+                task = this.graphClient.Drive.Items[id].Request().GetAsync();
+            }
+
 
             task.Wait();
             return task.Result;
@@ -79,7 +92,6 @@ namespace ServiceLayer.CloudStorageProviders
         {
             await InitGraphServiceClientAsync();
 
-            // OBS: Needs to be recursive
             DriveItem root = await graphClient.Drive.Root.Request().Expand("children").GetAsync();
 
             return root;
