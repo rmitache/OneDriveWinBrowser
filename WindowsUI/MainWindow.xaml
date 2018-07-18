@@ -17,7 +17,13 @@
         <!--Treeview-->
         <TreeView SelectedItemChanged="Treeview_SelectedItemChanged" Name="Treeview" Width="370" Height="350"  Margin="0 30 0 0"   
                   HorizontalAlignment="Left" FontSize="14">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="TreeViewItem">
+                    <Setter Property="TreeViewItem.IsExpanded" Value="True"/>
+                </Style>
+            </TreeView.ItemContainerStyle>
             <TreeView.ItemTemplate>
+                
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="16" Height="16">
