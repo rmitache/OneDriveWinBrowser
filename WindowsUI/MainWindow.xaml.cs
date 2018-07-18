@@ -27,54 +27,21 @@ namespace WindowsUI
         // Fields
         private FileStorageService fileStorageService;
 
-        // Private methods
-        //private List<TreeViewItem> GenerateTreeViewItems(List<IFileSystemEntity> list)
-        //{
-        //    //// This needs to be recursive !!!!
-        //    //var itemsList = new List<TreeViewItem>();
-        //    //foreach (IFileSystemEntity fileSystemEntity in list)
-        //    //{
-        //    //    TreeViewItem treeViewItem = new TreeViewItem();
-        //    //    treeViewItem.Header = fileSystemEntity.Name + " (" + ByteSize.FromBytes((double)fileSystemEntity.Size) + ")";
-        //    //    itemsList.Add(treeViewItem);
-        //    //}
-
-        //    //return itemsList;
-
-        //    return null;
-        //}
-        
-        //private TreeViewItem GenerateTreeViewItemRecursive(Folder folder)
-        //{
-        //    //// Create self
-        //    //var treeViewItem = new TreeViewItem();
-        //    //treeViewItem.Header = folder.Name;
-
-        //    //// Add items for child Folders
-        //    //foreach (Folder childFolder in folder.Folders)
-        //    //{
-        //    //    var folderTreeViewItem = GenerateTreeViewItemRecursive(childFolder); // recursive call to self
-        //    //    treeViewItem.Items.Add(folderTreeViewItem);
-        //    //}
-
-        //    //// Add items for child Files
-        //    //foreach (File file in folder.Files)
-        //    //{
-        //    //    var fileTreeViewItem = new TreeViewItem();
-        //    //    fileTreeViewItem.Header = GetFormattedTreeViewHeader(file.Name, file.Size);
-        //    //    treeViewItem.Items.Add(fileTreeViewItem);
-        //    //}
-
-        //    //return treeViewItem;
-        //}
-
         // Constructor
         public MainWindow()
         {
             this.fileStorageService = new FileStorageService();
             InitializeComponent();
 
+
+            // Some dummy data
             var Folder1 = new Folder("Test");
+            var ChildFile1 = new File("Child 1", 4250);
+            var ChildFile2 = new File("Child 2", 250);
+            var ChildFolder1 = new Folder("Child Folder 1");
+            Folder1.Files.Add(ChildFile1);
+            Folder1.Files.Add(ChildFile2);
+            Folder1.Folders.Add(ChildFolder1);
             var Folder2 = new Folder("Hey");
             var File1 = new File("Hey", 250);
             Treeview.ItemsSource = new object[] { Folder1, Folder2, File1 };
@@ -86,13 +53,13 @@ namespace WindowsUI
         {
             // Disable and clear controls
             LoginButton.IsEnabled = false;
-            Treeview.Items.Clear();
 
             // Get data from cloud and load into TreeView
             var rootFolder = await this.fileStorageService.GetRootFolderWithDescendants();
+            Treeview.ItemsSource = new object[] { rootFolder };
             //var rootTreeViewItem = this.GenerateTreeViewItemRecursive(rootFolder);
             //Treeview.Items.Add(rootTreeViewItem);
-            
+
 
         }
 

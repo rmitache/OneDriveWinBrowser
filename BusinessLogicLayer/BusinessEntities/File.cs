@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 namespace BusinessLogicLayer.BusinessEntities
 {
-    public class File: IFileSystemEntity
+    public class File : IFileSystemEntity
     {
+        // Properties
         public string Name { get; set; }
         public long? Size { get; set; }
 
+        // IFileSystemEntity implementation
         public string TypeName
         {
             get
@@ -31,7 +33,16 @@ namespace BusinessLogicLayer.BusinessEntities
                 return formattedString;
             }
         }
+        public List<IFileSystemEntity> Children
+        {
+            get
+            {
+                var list = new List<IFileSystemEntity>();
+                return list;
+            }
+        }
 
+        // Constructor
         public File(string name, long? size)
         {
             this.Name = name;

@@ -12,5 +12,6 @@ namespace BusinessLogicLayer.BusinessEntities
         long? Size { get; set; }
         string TypeName { get; }
         string FormattedName { get; }
+        List<IFileSystemEntity>  Children { get; }
     }
 }
