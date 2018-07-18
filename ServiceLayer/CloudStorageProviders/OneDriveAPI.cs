@@ -1,5 +1,6 @@
 ﻿using Microsoft.Graph;
 using Microsoft.Identity.Client;
+using System;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
@@ -11,11 +12,11 @@ namespace ServiceLayer.CloudStorageProviders
         private const string clientId = "1826dd27-ce57-42eb-a4df-441e00a4ff8f";
         private readonly string[] scopes = { "Files.ReadWrite.All" };
         private readonly PublicClientApplication IdentityClientApp = new PublicClientApplication(clientId);
-
+        public IUser user = null;
         private GraphServiceClient graphClient = null;
 
         // Private methods
-        private  async Task InitGraphServiceClientAsync()
+        private async Task InitGraphServiceClientAsync()
         {
             if (graphClient == null)
             {
@@ -30,31 +31,56 @@ namespace ServiceLayer.CloudStorageProviders
                                 }));
             }
         }
-        private  async Task<string> GetTokenForUserAsync()
+        private async Task<string> GetTokenForUserAsync()
         {
             AuthenticationResult authResult;
+            try
+            {
 
-            authResult = await IdentityClientApp.AcquireTokenAsync(scopes);
-            var accessToken = authResult.AccessToken;
+                authResult = await IdentityClientApp.AcquireTokenSilentAsync(scopes, this.user);
+            }
+
+            catch (Exception ex)
+            {
+                authResult = await IdentityClientApp.AcquireTokenAsync(scopes);
+                this.user = authResult.User;
+            }
 
 
-            return accessToken;
+            return authResult.AccessToken;
+        }
+        private async Task ExpandRecursivelyAsync(IDriveItemRequestBuilder driveItemRequest)
+        {
+            var driveItem = await driveItemRequest.Request().Expand("children").GetAsync();
+
+            // Expand children 
+            if (driveItem.Folder != null && driveItem.File == null)
+            {
+                foreach (DriveItem childItem in driveItem.Children.CurrentPage)
+                {
+                    var requestableChildItem = graphClient.Drive.Items[childItem.Id];
+                    await this.ExpandRecursivelyAsync(requestableChildItem);
+                }
+            }
+
         }
 
+
         // Public methods
-        public  async Task<DriveItem> GetAllInFileStructure()
+        public async Task<DriveItem> GetChildrenByItemIdAsync(string id)
+        {
+            DriveItem itemWithChildren = await this.graphClient.Drive.Items[id].Request().Expand("children").GetAsync();
+
+            return itemWithChildren;
+        }
+        public async Task<DriveItem> GetRootFolderAsync()
         {
             await InitGraphServiceClientAsync();
 
             // OBS: Needs to be recursive
-            DriveItem driveItem = await graphClient.Drive.Root.Request().GetAsync();
-            //while (driveItem..Request().Expand("children").GetAsync())
-            //{
+            DriveItem root = await graphClient.Drive.Root.Request().Expand("children").GetAsync();
 
-            //}
-
-            var rootDriveItem = await graphClient.Drive.Root.Request().Expand("children").GetAsync();
-            return rootDriveItem;
+            return root;
         }
     }
 }

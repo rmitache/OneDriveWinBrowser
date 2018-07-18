@@ -18,5 +18,11 @@ namespace BusinessLogicLayer.BusinessEntities
                 return "File";
             }
         }
+
+        public File(string name, long? size)
+        {
+            this.Name = name;
+            this.Size = size;
+        }
     }
 }

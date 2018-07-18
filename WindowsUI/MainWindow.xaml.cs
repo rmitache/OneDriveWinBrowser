@@ -57,17 +57,17 @@ namespace WindowsUI
 
             // Disable and clear controls
             LoginButton.IsEnabled = false;
-            Treeview.Items.Clear(); // Clear();
-            //Treeview.Visibility = Visibility.Visible;
+            Treeview.Items.Clear(); 
 
             // Get data from cloud and load into TreeView
             var fileSystemEntities = await this.fileStorageService.GetFileStorageRootFolder();
             var treeViewItems = this.GenerateTreeViewItems(fileSystemEntities);
-            treeViewItems.ForEach(item =>
-            {
-                Treeview.Items.Add(item);
-            });
-            treeViewItems.Reverse();
+            Treeview.ItemsSource = treeViewItems;
+            //treeViewItems.ForEach(item =>
+            //{
+            //    Treeview.Items.Add(item);
+            //});
+            //treeViewItems.Reverse();
 
         }
     }

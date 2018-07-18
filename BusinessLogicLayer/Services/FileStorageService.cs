@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ServiceLayer;
 using ServiceLayer.CloudStorageProviders;
+using Microsoft.Graph;
 
 namespace BusinessLogicLayer.Services
 {
@@ -13,6 +14,33 @@ namespace BusinessLogicLayer.Services
     {
         // Fields
         private OneDriveAPI oneDriveAPI;
+
+        // Private methods
+        private List<IFileSystemEntity> GenerateEntitiesFromDriveItemFolder(DriveItem item)
+        {
+            var list = new List<IFileSystemEntity>();
+
+
+            if (item.Folder != null && item.Children != null && item.Children.CurrentPage != null)
+            {
+                foreach (var obj in item.Children.CurrentPage)
+                {
+                    IFileSystemEntity newEntity;
+                    if (obj.Folder != null)
+                    {
+                        newEntity = new BusinessEntities.Folder(obj.Name, obj.Size);
+                    }
+                    else
+                    {
+                        newEntity = new BusinessEntities.File(obj.Name, obj.Size);
+                    }
+
+                    list.Add(newEntity);
+                }
+            }
+
+            return list;
+        }
 
         // Constructor
         public FileStorageService()
@@ -27,36 +55,10 @@ namespace BusinessLogicLayer.Services
             var list = new List<IFileSystemEntity>();
 
             // Parse the elements in the fileStorage root and convert them to IFileSystemEntities
-            var rootFolder = await oneDriveAPI.GetAllInFileStructure();
+            var rootFolder = await oneDriveAPI.GetRootFolderAsync();
             if (rootFolder != null)
             {
-                if (rootFolder.Folder != null && rootFolder.Children != null && rootFolder.Children.CurrentPage != null)
-                {
-                    foreach (var obj in rootFolder.Children.CurrentPage)
-                    {
-                        IFileSystemEntity newNode;
-                        if (obj.Folder != null)
-                        {
-                            newNode = new Folder
-                            {
-                                Name = obj.Name,
-                                Size = obj.Size
-                           
-                            };
-                        }
-                        else
-                        {
-                            newNode = new File
-                            {
-                                Name = obj.Name,
-                                Size = obj.Size
-                            };
-                        }
-                        
-
-                        list.Add(newNode);
-                    }
-                }
+                list = GenerateEntitiesFromDriveItemFolder(rootFolder);
             }
             return list;
         }

@@ -19,5 +19,14 @@ namespace BusinessLogicLayer.BusinessEntities
                 return "Folder";
             }
         }
+
+        public Folder(string name, long? size)
+        {
+            this.Name = name;
+            this.Size = size;
+
+            this.Files = new List<File>();
+            this.Folders = new List<Folder>();
+        }
     }
 }
