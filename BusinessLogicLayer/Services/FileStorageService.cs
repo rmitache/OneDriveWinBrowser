@@ -61,11 +61,11 @@ namespace BusinessLogicLayer.Services
 
             return rootFolder;
         }
-        public async Task<BusinessEntities.File> UploadFile(BusinessEntities.Folder targetFolder,string fileNameWithExtension, System.IO.Stream fileStream)
+        public async Task<BusinessEntities.File> UploadFile(BusinessEntities.Folder targetFolder, string fileNameWithExtension, System.IO.Stream fileStream)
         {
             // Get the targetFolder driveItem and the destination path (strip /drive/root: (12 characters) from the parent path string)
             var targetFolderDriveItem = this.oneDriveAPI.GetDriveItem(targetFolder.ID);
-            string destinationFolderPath = targetFolderDriveItem.ParentReference == null
+            string destinationFolderPath = (targetFolderDriveItem.Name == "root" && targetFolderDriveItem.ParentReference.Name == null)
                 ? ""
                 : targetFolderDriveItem.ParentReference.Path.Remove(0, 12) + "/" + Uri.EscapeUriString(targetFolderDriveItem.Name);
             var uploadPath = destinationFolderPath + "/" + fileNameWithExtension;

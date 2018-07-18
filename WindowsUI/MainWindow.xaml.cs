@@ -28,7 +28,7 @@ namespace WindowsUI
         // Fields
         private FileStorageService fileStorageService;
         private IFileSystemEntity selectedFileSystemEntity = null;
-        private object[] dummyTreeViewItems;
+        private object[] treeViewData;
 
 
         // Private methods
@@ -86,8 +86,8 @@ namespace WindowsUI
             var Folder2 = new Folder(dummyID, "Hey", 0, null);
             var File1 = new File(dummyID, "Hey", 250, null);
 
-            this.dummyTreeViewItems = new object[] { Folder1, Folder2, File1 };
-            Treeview.ItemsSource = dummyTreeViewItems;
+            this.treeViewData = new object[] { Folder1, Folder2, File1 };
+            Treeview.ItemsSource = treeViewData;
         }
 
         // Event handlers
@@ -100,7 +100,8 @@ namespace WindowsUI
             try
             {
                 var rootFolder = await this.fileStorageService.GetRootFolderWithDescendants();
-                Treeview.ItemsSource = new object[] { rootFolder };
+                this.treeViewData = new object[] { rootFolder };
+                Treeview.ItemsSource = this.treeViewData;
             }
             catch (Exception ex)
             {
@@ -135,14 +136,6 @@ namespace WindowsUI
         }
         private async void UploadButton_Click(object sender, RoutedEventArgs e)
         {
-            //// SIMULATE Add OPERATION (locally in the UI only)
-            //var targetFolder = selectedFileSystemEntity as Folder;
-            //var ChildFolder1 = new Folder("New", "Child Folder 1", 0, targetFolder);
-            //targetFolder.Folders.Add(ChildFolder1);
-
-            //// Refresh the collection 
-            //CollectionViewSource.GetDefaultView(this.dummyTreeViewItems).Refresh();
-
             var parentUploadFolder = selectedFileSystemEntity as Folder;
             string filename;
             using (var stream = GetFileStreamForUpload(parentUploadFolder.Name, out filename))
@@ -152,7 +145,11 @@ namespace WindowsUI
                     var uploadedFile = await this.fileStorageService.UploadFile(parentUploadFolder, filename, stream);
                     if(uploadedFile!=null)
                     {
-                        MessageBox.Show("File with name " + filename + " was uploaded successfully !");
+                        parentUploadFolder.Files.Add(uploadedFile);
+                        uploadedFile.ParentFolder = parentUploadFolder;
+                        CollectionViewSource.GetDefaultView(this.treeViewData).Refresh(); // refresh the TreeView UI
+
+                        //MessageBox.Show("File with name " + filename + " was uploaded successfully !");
                     } else
                     {
                         MessageBox.Show("File with name " + filename + " couldn't be uploaded. Please try again later");
