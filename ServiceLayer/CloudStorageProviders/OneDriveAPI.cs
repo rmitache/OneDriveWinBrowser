@@ -8,13 +8,14 @@ namespace ServiceLayer.CloudStorageProviders
     public class OneDriveAPI
     {
         // Fields
-        private static string clientId = "1826dd27-ce57-42eb-a4df-441e00a4ff8f";
-        private static PublicClientApplication IdentityClientApp = new PublicClientApplication(clientId);
-        private static string[] scopes = { "Files.ReadWrite.All" };
-        private static GraphServiceClient graphClient = null;
+        private const string clientId = "1826dd27-ce57-42eb-a4df-441e00a4ff8f";
+        private readonly string[] scopes = { "Files.ReadWrite.All" };
+        private readonly PublicClientApplication IdentityClientApp = new PublicClientApplication(clientId);
+
+        private GraphServiceClient graphClient = null;
 
         // Private methods
-        private static async Task InitGraphServiceClientAsync()
+        private  async Task InitGraphServiceClientAsync()
         {
             if (graphClient == null)
             {
@@ -29,7 +30,7 @@ namespace ServiceLayer.CloudStorageProviders
                                 }));
             }
         }
-        private static async Task<string> GetTokenForUserAsync()
+        private  async Task<string> GetTokenForUserAsync()
         {
             AuthenticationResult authResult;
 
@@ -41,9 +42,17 @@ namespace ServiceLayer.CloudStorageProviders
         }
 
         // Public methods
-        public static async Task<DriveItem> GetAllInFileStructure()
+        public  async Task<DriveItem> GetAllInFileStructure()
         {
             await InitGraphServiceClientAsync();
+
+            // OBS: Needs to be recursive
+            DriveItem driveItem = await graphClient.Drive.Root.Request().GetAsync();
+            //while (driveItem..Request().Expand("children").GetAsync())
+            //{
+
+            //}
+
             var rootDriveItem = await graphClient.Drive.Root.Request().Expand("children").GetAsync();
             return rootDriveItem;
         }

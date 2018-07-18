@@ -11,13 +11,23 @@ namespace BusinessLogicLayer.Services
 {
     public class FileStorageService
     {
+        // Fields
+        private OneDriveAPI oneDriveAPI;
+
+        // Constructor
+        public FileStorageService()
+        {
+            this.oneDriveAPI = new OneDriveAPI();
+        }
+
+        // Public methods
         public async Task<List<IFileSystemEntity>> GetFileStorageRootFolder()
         {
             // Variables
             var list = new List<IFileSystemEntity>();
 
             // Parse the elements in the fileStorage root and convert them to IFileSystemEntities
-            var rootFolder = await OneDriveAPI.GetAllInFileStructure();
+            var rootFolder = await oneDriveAPI.GetAllInFileStructure();
             if (rootFolder != null)
             {
                 if (rootFolder.Folder != null && rootFolder.Children != null && rootFolder.Children.CurrentPage != null)

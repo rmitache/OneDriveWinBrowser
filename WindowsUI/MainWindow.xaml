@@ -9,7 +9,7 @@
         Title="MainWindow" Height="510" Width="440">
 
     <StackPanel Margin="20">
-        
+
 
         <!--Buttons-->
         <WrapPanel HorizontalAlignment="Left">
@@ -17,9 +17,10 @@
             <Button  Width="80" Name="DownloadButton" Content="Download" HorizontalAlignment="Right" ></Button>
             <Button  Width="80" Name="UploadButton" Content="Upload" HorizontalAlignment="Right" ></Button>
         </WrapPanel>
-        
+
         <!--Treeview-->
-        <TreeView Name="Treeview" Width="370" Height="350" Margin="0 30 0 0"   HorizontalAlignment="Left">
+        <TreeView Name="Treeview" Width="370" Height="350" Margin="0 30 0 0"   HorizontalAlignment="Left" FontSize="14">
+            
             <TreeViewItem Header="Level 1" IsExpanded="True">
                 <TreeViewItem Header="Level 2.1" />
                 <TreeViewItem Header="Level 2.2" IsExpanded="True">
@@ -29,7 +30,7 @@
                 <TreeViewItem Header="Level 2.3" />
             </TreeViewItem>
         </TreeView>
-        
-        
+
+
     </StackPanel>
 </Window>

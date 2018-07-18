@@ -12,5 +12,12 @@ namespace BusinessLogicLayer.BusinessEntities
         public long? Size { get; set; }
         public List<File> Files { get; set; }
         public List<Folder> Folders { get; set; }
+        public string TypeName
+        {
+            get
+            {
+                return "Folder";
+            }
+        }
     }
 }

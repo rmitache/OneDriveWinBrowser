@@ -10,5 +10,13 @@ namespace BusinessLogicLayer.BusinessEntities
     {
         public string Name { get; set; }
         public long? Size { get; set; }
+
+        public string TypeName
+        {
+            get
+            {
+                return "File";
+            }
+        }
     }
 }

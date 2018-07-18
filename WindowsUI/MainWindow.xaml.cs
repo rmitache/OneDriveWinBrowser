@@ -3,6 +3,7 @@ using BusinessLogicLayer.Services;
 using ByteSizeLib;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ using System.Windows.Shapes;
 
 namespace WindowsUI
 {
+    
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -29,11 +31,12 @@ namespace WindowsUI
         // Private methods
         private List<TreeViewItem> GenerateTreeViewItems(List<IFileSystemEntity> list)
         {
+            // This needs to be recursive !!!!
             var itemsList = new List<TreeViewItem>();
             foreach (IFileSystemEntity fileSystemEntity in list)
             {
                 TreeViewItem treeViewItem = new TreeViewItem();
-                treeViewItem.Header = fileSystemEntity.Name + " - " + ByteSize.FromBytes((double)fileSystemEntity.Size);
+                treeViewItem.Header = fileSystemEntity.Name + " (" + ByteSize.FromBytes((double)fileSystemEntity.Size) + ")";
                 itemsList.Add(treeViewItem);
             }
 
