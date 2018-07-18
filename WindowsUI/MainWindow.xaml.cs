@@ -19,7 +19,7 @@ using System.Windows.Shapes;
 
 namespace WindowsUI
 {
-    
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -42,6 +42,38 @@ namespace WindowsUI
 
             return itemsList;
         }
+        private static string GetFormattedTreeViewHeader(string name, long? size = null)
+        {
+            string formattedString = name;
+            if (size != null)
+            {
+                formattedString += " (" + ByteSize.FromBytes((double)size) + ")";
+            }
+            return formattedString;
+        }
+        private TreeViewItem GenerateTreeViewItemRecursive(Folder folder)
+        {
+            // Create self
+            var treeViewItem = new TreeViewItem();
+            treeViewItem.Header = folder.Name;
+
+            // Add items for child Folders
+            foreach (Folder childFolder in folder.Folders)
+            {
+                var folderTreeViewItem = GenerateTreeViewItemRecursive(childFolder); // recursive call to self
+                treeViewItem.Items.Add(folderTreeViewItem);
+            }
+
+            // Add items for child Files
+            foreach (File file in folder.Files)
+            {
+                var fileTreeViewItem = new TreeViewItem();
+                fileTreeViewItem.Header = GetFormattedTreeViewHeader(file.Name, file.Size);
+                treeViewItem.Items.Add(fileTreeViewItem);
+            }
+
+            return treeViewItem;
+        }
 
         // Constructor
         public MainWindow()
@@ -54,20 +86,14 @@ namespace WindowsUI
         // Event handlers
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-
             // Disable and clear controls
             LoginButton.IsEnabled = false;
-            Treeview.Items.Clear(); 
+            Treeview.Items.Clear();
 
             // Get data from cloud and load into TreeView
-            var fileSystemEntities = await this.fileStorageService.GetRootFolderWithDescendants();
-            //var treeViewItems = this.GenerateTreeViewItems(fileSystemEntities);
-            //Treeview.ItemsSource = treeViewItems;
-            //treeViewItems.ForEach(item =>
-            //{
-            //    Treeview.Items.Add(item);
-            //});
-            //treeViewItems.Reverse();
+            var rootFolder = await this.fileStorageService.GetRootFolderWithDescendants();
+            var rootTreeViewItem = this.GenerateTreeViewItemRecursive(rootFolder);
+            Treeview.Items.Add(rootTreeViewItem);
 
         }
     }
