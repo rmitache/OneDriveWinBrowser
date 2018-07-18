@@ -11,5 +11,6 @@ namespace BusinessLogicLayer.BusinessEntities
         string Name { get; set; }
         long? Size { get; set; }
         string TypeName { get; }
+        string FormattedName { get; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ByteSizeLib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,20 @@ namespace BusinessLogicLayer.BusinessEntities
             }
         }
 
-        public Folder(string name, long? size)
+        public string FormattedName
+        {
+            get
+            {
+                string formattedString = this.Name;
+                if (this.Size != null)
+                {
+                    formattedString += " (" + ByteSize.FromBytes((double)this.Size) + ")";
+                }
+                return formattedString;
+            }
+        }
+
+        public Folder(string name, long? size = null)
         {
             this.Name = name;
             this.Size = size;

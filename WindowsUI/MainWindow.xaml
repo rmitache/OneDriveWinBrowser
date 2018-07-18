@@ -19,18 +19,37 @@
         </WrapPanel>
 
         <!--Treeview-->
-        <TreeView Name="Treeview" Width="370" Height="350" Margin="0 30 0 0"   HorizontalAlignment="Left" FontSize="14">
-            
-            <TreeViewItem Header="Level 1" IsExpanded="True">
-                <TreeViewItem Header="Level 2.1" />
-                <TreeViewItem Header="Level 2.2" IsExpanded="True">
-                    <TreeViewItem Header="Level 3.1" />
-                    <TreeViewItem Header="Level 3.2" />
-                </TreeViewItem>
-                <TreeViewItem Header="Level 2.3" />
-            </TreeViewItem>
+        <TreeView SelectedItemChanged="Treeview_SelectedItemChanged" Name="Treeview" Width="370" Height="350"  Margin="0 30 0 0"   
+                  HorizontalAlignment="Left" FontSize="14">
+            <TreeView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+
+                        <Image Width="16" Height="16">
+                            <Image.Style>
+                                <Style TargetType="Image">
+                                    <Style.Triggers>
+                                        <DataTrigger  Binding="{Binding TypeName}" Value="Folder">
+                                            <Setter Property="Source" Value="/Content/Folder.png"/>
+                                        </DataTrigger >
+                                        <DataTrigger  Binding="{Binding TypeName}" Value="File">
+                                            <Setter Property="Source" Value="/Content/File.png"/>
+                                        </DataTrigger >
+                                    </Style.Triggers>
+                                </Style>
+                            </Image.Style>
+                        </Image>
+
+                        <TextBlock Text="{Binding FormattedName}" Margin="5 0 0 0"/>
+                    </StackPanel>
+                </DataTemplate>
+            </TreeView.ItemTemplate>
         </TreeView>
 
+
+        
+
+        <Label Name="lblTaskNameTitle" />
 
     </StackPanel>
 </Window>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ByteSizeLib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,18 @@ namespace BusinessLogicLayer.BusinessEntities
             get
             {
                 return "File";
+            }
+        }
+        public string FormattedName
+        {
+            get
+            {
+                string formattedString = this.Name;
+                if (this.Size != null)
+                {
+                    formattedString += " (" + ByteSize.FromBytes((double)this.Size) + ")";
+                }
+                return formattedString;
             }
         }
 
