@@ -67,11 +67,13 @@ namespace ServiceLayer.CloudStorageProviders
 
 
         // Public methods
-        public async Task<DriveItem> GetChildrenByItemIdAsync(string id)
+        public DriveItem GetExpandedDriveItem(string id)
         {
-            DriveItem itemWithChildren = await this.graphClient.Drive.Items[id].Request().Expand("children").GetAsync();
+            Task<DriveItem> task;
+            task = this.graphClient.Drive.Items[id].Request().Expand("children").GetAsync();
 
-            return itemWithChildren;
+            task.Wait();
+            return task.Result;
         }
         public async Task<DriveItem> GetRootFolderAsync()
         {

@@ -60,9 +60,9 @@ namespace WindowsUI
             Treeview.Items.Clear(); 
 
             // Get data from cloud and load into TreeView
-            var fileSystemEntities = await this.fileStorageService.GetFileStorageRootFolder();
-            var treeViewItems = this.GenerateTreeViewItems(fileSystemEntities);
-            Treeview.ItemsSource = treeViewItems;
+            var fileSystemEntities = await this.fileStorageService.GetRootFolderWithDescendants();
+            //var treeViewItems = this.GenerateTreeViewItems(fileSystemEntities);
+            //Treeview.ItemsSource = treeViewItems;
             //treeViewItems.ForEach(item =>
             //{
             //    Treeview.Items.Add(item);

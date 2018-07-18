@@ -16,30 +16,32 @@ namespace BusinessLogicLayer.Services
         private OneDriveAPI oneDriveAPI;
 
         // Private methods
-        private List<IFileSystemEntity> GenerateEntitiesFromDriveItemFolder(DriveItem item)
+        private void RequestAndGenerateChildrenEntitiesRecursively(BusinessEntities.Folder parentFolder, DriveItem expandedFolderDriveItem)
         {
-            var list = new List<IFileSystemEntity>();
 
-
-            if (item.Folder != null && item.Children != null && item.Children.CurrentPage != null)
+            // Generate entities for its children
+            foreach (var childDriveItem in expandedFolderDriveItem.Children.CurrentPage)
             {
-                foreach (var obj in item.Children.CurrentPage)
+                // Folder
+                if (childDriveItem.Folder != null)
                 {
-                    IFileSystemEntity newEntity;
-                    if (obj.Folder != null)
-                    {
-                        newEntity = new BusinessEntities.Folder(obj.Name, obj.Size);
-                    }
-                    else
-                    {
-                        newEntity = new BusinessEntities.File(obj.Name, obj.Size);
-                    }
+                    var newChildFolder = new BusinessEntities.Folder(childDriveItem.Name, childDriveItem.Size);
+                    parentFolder.Folders.Add(newChildFolder);
 
-                    list.Add(newEntity);
+                    // Generate its children when it is a Folder
+                    if (expandedFolderDriveItem.Children != null && expandedFolderDriveItem.Children.CurrentPage != null)
+                    {
+                        var expandedChildDriveItem = oneDriveAPI.GetExpandedDriveItem(childDriveItem.Id);
+                        RequestAndGenerateChildrenEntitiesRecursively(newChildFolder, expandedChildDriveItem);
+                    }
+                }
+                // File
+                else if (childDriveItem.File != null)
+                {
+                    var newFile = new BusinessEntities.File(childDriveItem.Name, childDriveItem.Size);
+                    parentFolder.Files.Add(newFile);
                 }
             }
-
-            return list;
         }
 
         // Constructor
@@ -49,18 +51,15 @@ namespace BusinessLogicLayer.Services
         }
 
         // Public methods
-        public async Task<List<IFileSystemEntity>> GetFileStorageRootFolder()
+        public async Task<BusinessEntities.Folder> GetRootFolderWithDescendants()
         {
-            // Variables
-            var list = new List<IFileSystemEntity>();
+            //
+            var rootFolder = new BusinessEntities.Folder("Root", 0);
+            var rootDriveItem = await oneDriveAPI.GetRootFolderAsync();
+            this.RequestAndGenerateChildrenEntitiesRecursively(rootFolder, rootDriveItem);
 
-            // Parse the elements in the fileStorage root and convert them to IFileSystemEntities
-            var rootFolder = await oneDriveAPI.GetRootFolderAsync();
-            if (rootFolder != null)
-            {
-                list = GenerateEntitiesFromDriveItemFolder(rootFolder);
-            }
-            return list;
+
+            return rootFolder;
         }
     }
 
