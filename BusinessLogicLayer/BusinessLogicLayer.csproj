@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="BusinessEntities\File.cs" />
     <Compile Include="BusinessEntities\Folder.cs" />
+    <Compile Include="BusinessEntities\FileSystemEntityType.cs" />
     <Compile Include="BusinessEntities\IFileSystemEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\FileStorageService.cs" />

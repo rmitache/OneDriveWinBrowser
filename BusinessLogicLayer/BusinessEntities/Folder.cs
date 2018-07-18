@@ -43,9 +43,14 @@ namespace BusinessLogicLayer.BusinessEntities
                 var list = new List<IFileSystemEntity>();
                 list.AddRange(this.Folders);
                 list.AddRange(this.Files);
-                //list.AddRange(this.Folders.ConvertAll(folder => (IFileSystemEntity)folder));
-                //list.AddRange(this.Files.ConvertAll(file => (IFileSystemEntity)file));
                 return list;
+            }
+        }
+        public IFileSystemEntityType EntityType
+        {
+            get
+            {
+                return IFileSystemEntityType.Folder;
             }
         }
 

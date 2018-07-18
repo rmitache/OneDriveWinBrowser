@@ -47,7 +47,6 @@ namespace WindowsUI
             Treeview.ItemsSource = new object[] { Folder1, Folder2, File1 };
         }
 
-
         // Event handlers
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
@@ -55,20 +54,46 @@ namespace WindowsUI
             LoginButton.IsEnabled = false;
 
             // Get data from cloud and load into TreeView
-            var rootFolder = await this.fileStorageService.GetRootFolderWithDescendants();
-            Treeview.ItemsSource = new object[] { rootFolder };
-            //var rootTreeViewItem = this.GenerateTreeViewItemRecursive(rootFolder);
-            //Treeview.Items.Add(rootTreeViewItem);
-
-
+            try
+            {
+                var rootFolder = await this.fileStorageService.GetRootFolderWithDescendants();
+                Treeview.ItemsSource = new object[] { rootFolder };
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Login failed - " + ex.Message);
+            }
         }
-
         private void Treeview_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            var selectedEntity = e.NewValue as IFileSystemEntity;
-            lblTaskNameTitle.Content = selectedEntity.Name;
+            if (e.NewValue != null)
+            {
+                var selectedEntity = e.NewValue as IFileSystemEntity;
+                lblTaskNameTitle.Content = selectedEntity.Name;
+
+
+                // Enable/disable action buttons
+                this.UploadButton.IsEnabled = true; // always enabled when something is selected
+                switch (selectedEntity.EntityType)
+                {
+                    case IFileSystemEntityType.Folder:
+                        this.DownloadButton.IsEnabled = false;
+
+                        break;
+                    case IFileSystemEntityType.File:
+                        this.DownloadButton.IsEnabled = true;
+                        break;
+                }
+            }
+        }
+        private void DownloadButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
-        
+        private void UploadButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

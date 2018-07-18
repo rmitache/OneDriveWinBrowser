@@ -41,6 +41,11 @@ namespace BusinessLogicLayer.BusinessEntities
                 return list;
             }
         }
+        public IFileSystemEntityType EntityType { get
+            {
+                return IFileSystemEntityType.File;
+            }
+        }
 
         // Constructor
         public File(string name, long? size)
