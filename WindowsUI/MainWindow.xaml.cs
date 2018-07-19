@@ -30,7 +30,6 @@ namespace WindowsUI
         private IFileSystemEntity selectedFileSystemEntity = null;
         private object[] treeViewData;
 
-
         // Private methods
         private System.IO.Stream GetFileStreamForUpload(string targetFolderName, out string sourceFileName)
         {
@@ -74,20 +73,20 @@ namespace WindowsUI
             InitializeComponent();
 
 
-            // Some dummy data
-            var dummyID = "NA";
-            var Folder1 = new Folder(dummyID, "Test", 0, null);
-            var ChildFile1 = new File(dummyID, "Child 1", 4250, Folder1);
-            var ChildFile2 = new File(dummyID, "Child 2", 250, Folder1);
-            var ChildFolder1 = new Folder(dummyID, "Child Folder 1", 0, Folder1);
-            Folder1.Files.Add(ChildFile1);
-            Folder1.Files.Add(ChildFile2);
-            Folder1.Folders.Add(ChildFolder1);
-            var Folder2 = new Folder(dummyID, "Hey", 0, null);
-            var File1 = new File(dummyID, "Hey", 250, null);
+            //// DUMMY DATA FOR TESTING PURPOSES
+            //var dummyID = "NA";
+            //var Folder1 = new Folder(dummyID, "Test", 0, null);
+            //var ChildFile1 = new File(dummyID, "Child 1", 4250, Folder1);
+            //var ChildFile2 = new File(dummyID, "Child 2", 250, Folder1);
+            //var ChildFolder1 = new Folder(dummyID, "Child Folder 1", 0, Folder1);
+            //Folder1.Files.Add(ChildFile1);
+            //Folder1.Files.Add(ChildFile2);
+            //Folder1.Folders.Add(ChildFolder1);
+            //var Folder2 = new Folder(dummyID, "Hey", 0, null);
+            //var File1 = new File(dummyID, "Hey", 250, null);
 
-            this.treeViewData = new object[] { Folder1, Folder2, File1 };
-            Treeview.ItemsSource = treeViewData;
+            //this.treeViewData = new object[] { Folder1, Folder2, File1 };
+            //Treeview.ItemsSource = treeViewData;
         }
 
         // Event handlers
@@ -130,9 +129,33 @@ namespace WindowsUI
                 }
             }
         }
-        private void DownloadButton_Click(object sender, RoutedEventArgs e)
+        private async void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
-            
+            var targetFile = selectedFileSystemEntity as File;
+            try
+            {
+                // Setup a dialog prompting the user to choose the download location
+                var dialog = new SaveFileDialog
+                {
+                    FileName = targetFile.Name,
+                    Filter = "All Files (*.*)|*.*"
+                };
+                if (dialog.ShowDialog() != true)
+                    return;
+
+                // Download the file 
+                var fileDownloadPath = dialog.FileName;
+                using (var fileStream = await this.fileStorageService.DownloadFile(targetFile))
+                using (var outputStream = new System.IO.FileStream(dialog.FileName, System.IO.FileMode.Create))
+                {
+                    await fileStream.CopyToAsync(outputStream);
+                    MessageBox.Show("File " + targetFile.Name +" successfully downloaded to " + fileDownloadPath);
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Download failed - " + ex.Message);
+            }
         }
         private async void UploadButton_Click(object sender, RoutedEventArgs e)
         {
@@ -149,10 +172,10 @@ namespace WindowsUI
                         uploadedFile.ParentFolder = parentUploadFolder;
                         CollectionViewSource.GetDefaultView(this.treeViewData).Refresh(); // refresh the TreeView UI
 
-                        //MessageBox.Show("File with name " + filename + " was uploaded successfully !");
+                        MessageBox.Show("File with name " + filename + " was uploaded successfully !");
                     } else
                     {
-                        MessageBox.Show("File with name " + filename + " couldn't be uploaded. Please try again later");
+                        MessageBox.Show("File with name " + filename + " couldn't be uploaded. Please try again later", "Error!");
                     }
                 }
             }

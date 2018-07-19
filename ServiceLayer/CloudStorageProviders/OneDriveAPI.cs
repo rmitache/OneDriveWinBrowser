@@ -88,6 +88,11 @@ namespace ServiceLayer.CloudStorageProviders
             task.Wait();
             return task.Result;
         }
+        public async Task<System.IO.Stream> GetDriveItemContentAsync(string id)
+        {
+            var stream = await this.graphClient.Drive.Items[id].Content.Request().GetAsync();
+            return stream;
+        }
         public async Task<DriveItem> GetRootFolderAsync()
         {
             await InitGraphServiceClientAsync();

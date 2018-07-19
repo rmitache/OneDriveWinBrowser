@@ -85,6 +85,20 @@ namespace BusinessLogicLayer.Services
 
             return uploadedFile;
         }
+        public async Task<System.IO.Stream> DownloadFile(BusinessEntities.File targetFile)
+        {
+            System.IO.Stream fileStream = null;
+            try
+            {
+                fileStream = await this.oneDriveAPI.GetDriveItemContentAsync(targetFile.ID);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return fileStream;
+        }
     }
 
 }
