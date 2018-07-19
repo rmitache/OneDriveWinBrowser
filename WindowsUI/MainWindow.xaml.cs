@@ -131,7 +131,7 @@ namespace WindowsUI
         }
         private async void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
-            var targetFile = selectedFileSystemEntity as File;
+            var targetFile = this.selectedFileSystemEntity as File;
             try
             {
                 // Setup a dialog prompting the user to choose the download location
@@ -159,7 +159,8 @@ namespace WindowsUI
         }
         private async void UploadButton_Click(object sender, RoutedEventArgs e)
         {
-            var parentUploadFolder = selectedFileSystemEntity as Folder;
+            var parentUploadFolder = this.selectedFileSystemEntity as Folder;
+
             string filename;
             using (var stream = GetFileStreamForUpload(parentUploadFolder.Name, out filename))
             {
