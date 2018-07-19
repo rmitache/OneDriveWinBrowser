@@ -72,21 +72,21 @@ namespace ServiceLayer.CloudStorageProviders
             var uploadedItem = await graphClient.Drive.Root.ItemWithPath(uploadPath).Content.Request().PutAsync<DriveItem>(fileStream);
             return uploadedItem;
         }
-        public DriveItem GetDriveItem(string id, bool expandChildren = true)
+        public async Task<DriveItem> GetDriveItemAsync(string id, bool expandChildren = true)
         {
-            Task<DriveItem> task;
+            Task<DriveItem> driveItemTask;
             if (expandChildren)
             {
-                task = this.graphClient.Drive.Items[id].Request().Expand("children").GetAsync();
+                driveItemTask =  this.graphClient.Drive.Items[id].Request().Expand("children").GetAsync();
             }
             else
             {
-                task = this.graphClient.Drive.Items[id].Request().GetAsync();
+                driveItemTask =   this.graphClient.Drive.Items[id].Request().GetAsync();
             }
 
 
-            task.Wait();
-            return task.Result;
+            driveItemTask.Wait();
+            return driveItemTask.Result;
         }
         public async Task<System.IO.Stream> GetDriveItemContentAsync(string id)
         {

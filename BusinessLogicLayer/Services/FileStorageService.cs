@@ -16,7 +16,7 @@ namespace BusinessLogicLayer.Services
         private OneDriveAPI oneDriveAPI;
 
         // Private methods
-        private void RequestAndGenerateChildrenEntitiesRecursively(BusinessEntities.Folder parentFolder, DriveItem expandedFolderDriveItem)
+        private async void RequestAndGenerateChildrenEntitiesRecursively(BusinessEntities.Folder parentFolder, DriveItem expandedFolderDriveItem)
         {
             // Generate entities for its children
             foreach (var childDriveItem in expandedFolderDriveItem.Children.CurrentPage)
@@ -30,7 +30,7 @@ namespace BusinessLogicLayer.Services
                     // Generate its children when it is a Folder
                     if (expandedFolderDriveItem.Children != null && expandedFolderDriveItem.Children.CurrentPage != null)
                     {
-                        var expandedChildDriveItem = oneDriveAPI.GetDriveItem(childDriveItem.Id);
+                        var expandedChildDriveItem = await oneDriveAPI.GetDriveItemAsync(childDriveItem.Id);
                         RequestAndGenerateChildrenEntitiesRecursively(newChildFolder, expandedChildDriveItem);
                     }
                 }
@@ -53,7 +53,6 @@ namespace BusinessLogicLayer.Services
         public async Task<BusinessEntities.Folder> GetRootFolderWithDescendants()
         {
             //
-
             var rootDriveItem = await oneDriveAPI.GetRootFolderAsync();
             var rootFolder = new BusinessEntities.Folder(rootDriveItem.Id, "Root", rootDriveItem.Size, null);
             this.RequestAndGenerateChildrenEntitiesRecursively(rootFolder, rootDriveItem);
@@ -64,7 +63,7 @@ namespace BusinessLogicLayer.Services
         public async Task<BusinessEntities.File> UploadFile(BusinessEntities.Folder targetFolder, string fileNameWithExtension, System.IO.Stream fileStream)
         {
             // Get the targetFolder driveItem and the destination path (strip /drive/root: (12 characters) from the parent path string)
-            var targetFolderDriveItem = this.oneDriveAPI.GetDriveItem(targetFolder.ID);
+            var targetFolderDriveItem = await this.oneDriveAPI.GetDriveItemAsync(targetFolder.ID);
             string destinationFolderPath = (targetFolderDriveItem.Name == "root" && targetFolderDriveItem.ParentReference.Name == null)
                 ? ""
                 : targetFolderDriveItem.ParentReference.Path.Remove(0, 12) + "/" + Uri.EscapeUriString(targetFolderDriveItem.Name);
