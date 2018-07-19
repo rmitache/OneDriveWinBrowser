@@ -26,7 +26,7 @@ namespace WindowsUI
     public partial class MainWindow : Window
     {
         // Fields
-        private FileStorageService fileStorageService;
+        private IFileStorageService fileStorageService;
         private IFileSystemEntity selectedFileSystemEntity = null;
         private object[] treeViewData;
 

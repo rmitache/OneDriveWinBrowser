@@ -10,10 +10,10 @@ using Microsoft.Graph;
 
 namespace BusinessLogicLayer.Services
 {
-    public class FileStorageService
+    public class FileStorageService: IFileStorageService
     {
         // Fields
-        private OneDriveAPI oneDriveAPI;
+        private IMicrosoftGraphAPIProvider oneDriveAPI;
 
         // Private methods
         private async void RequestAndGenerateChildrenEntitiesRecursively(BusinessEntities.Folder parentFolder, DriveItem expandedFolderDriveItem)
