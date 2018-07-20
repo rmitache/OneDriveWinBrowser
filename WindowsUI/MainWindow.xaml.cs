@@ -67,9 +67,9 @@ namespace WindowsUI
         }
 
         // Constructor
-        public MainWindow()
+        public MainWindow(IFileStorageService fileStorageService)
         {
-            this.fileStorageService = new FileStorageService();
+            this.fileStorageService = fileStorageService;
             InitializeComponent();
 
 
