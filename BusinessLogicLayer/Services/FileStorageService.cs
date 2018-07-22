@@ -13,7 +13,7 @@ namespace BusinessLogicLayer.Services
     public class FileStorageService: IFileStorageService
     {
         // Fields
-        private IMicrosoftGraphAPIProvider oneDriveAPI;
+        private IMicrosoftGraphAPIProvider graphAPI;
 
         // Private methods
         private async void RequestAndGenerateChildrenEntitiesRecursively(BusinessEntities.Folder parentFolder, DriveItem expandedFolderDriveItem)
@@ -30,7 +30,7 @@ namespace BusinessLogicLayer.Services
                     // Generate its children when it is a Folder
                     if (expandedFolderDriveItem.Children != null && expandedFolderDriveItem.Children.CurrentPage != null)
                     {
-                        var expandedChildDriveItem = await oneDriveAPI.GetDriveItemAsync(childDriveItem.Id);
+                        var expandedChildDriveItem = await graphAPI.GetDriveItemAsync(childDriveItem.Id);
                         RequestAndGenerateChildrenEntitiesRecursively(newChildFolder, expandedChildDriveItem);
                     }
                 }
@@ -44,16 +44,16 @@ namespace BusinessLogicLayer.Services
         }
 
         // Constructor
-        public FileStorageService()
+        public FileStorageService(IMicrosoftGraphAPIProvider graphAPI)
         {
-            this.oneDriveAPI = new OneDriveAPI();
+            this.graphAPI = graphAPI;
         }
 
         // Public methods
         public async Task<BusinessEntities.Folder> GetRootFolderWithDescendants()
         {
             //
-            var rootDriveItem = await oneDriveAPI.GetRootFolderAsync();
+            var rootDriveItem = await graphAPI.GetRootFolderAsync();
             var rootFolder = new BusinessEntities.Folder(rootDriveItem.Id, "Root", rootDriveItem.Size, null);
             this.RequestAndGenerateChildrenEntitiesRecursively(rootFolder, rootDriveItem);
 
@@ -63,7 +63,7 @@ namespace BusinessLogicLayer.Services
         public async Task<BusinessEntities.File> UploadFile(BusinessEntities.Folder targetFolder, string fileNameWithExtension, System.IO.Stream fileStream)
         {
             // Get the targetFolder driveItem and the destination path (strip /drive/root: (12 characters) from the parent path string)
-            var targetFolderDriveItem = await this.oneDriveAPI.GetDriveItemAsync(targetFolder.ID);
+            var targetFolderDriveItem = await this.graphAPI.GetDriveItemAsync(targetFolder.ID);
             string destinationFolderPath = (targetFolderDriveItem.Name == "root" && targetFolderDriveItem.ParentReference.Name == null)
                 ? ""
                 : targetFolderDriveItem.ParentReference.Path.Remove(0, 12) + "/" + Uri.EscapeUriString(targetFolderDriveItem.Name);
@@ -74,7 +74,7 @@ namespace BusinessLogicLayer.Services
             BusinessEntities.File uploadedFile = null;
             try
             {
-                var uploadedItem = await this.oneDriveAPI.UploadDriveItemAsync(uploadPath, fileStream);
+                var uploadedItem = await this.graphAPI.UploadDriveItemAsync(uploadPath, fileStream);
                 uploadedFile = new BusinessEntities.File(uploadedItem.Id, uploadedItem.Name, uploadedItem.Size, null);
             }
             catch (Exception exception)
@@ -89,7 +89,7 @@ namespace BusinessLogicLayer.Services
             System.IO.Stream fileStream = null;
             try
             {
-                fileStream = await this.oneDriveAPI.GetDriveItemContentAsync(targetFile.ID);
+                fileStream = await this.graphAPI.GetDriveItemContentAsync(targetFile.ID);
             }
             catch (Exception ex)
             {

@@ -5,21 +5,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ninject.Extensions.Conventions;
+using System.Reflection;
+using ServiceLayer.CloudStorageProviders;
 
 namespace WindowsUI.Code
 {
-    public class IocConfiguration:NinjectModule
+    public class IocConfiguration : NinjectModule
     {
         public override void Load()
         {
             // ServiceLayer
-            Bind<IFileStorageService>().To<FileStorageService>().InTransientScope(); 
-            //Bind<UserControlViewModel>().ToSelf().InTransientScope();
+            Bind<IMicrosoftGraphAPIProvider>().To<OneDriveAPI>().InTransientScope();
 
-            //Bind(x => x.FromAssembliesMatching("My.*.dll")
-            //        .SelectAllClasses()
-            //        .BindAllInterfaces()
-            //);
+            // BusinessLogicLayer
+            this.Kernel.Bind(x => x.FromAssemblyContaining(typeof(IFileStorageService))
+                    .SelectAllClasses()
+                    .BindAllInterfaces().Configure(b=> b.InTransientScope()));
         }
     }
 }
