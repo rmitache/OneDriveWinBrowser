@@ -49,21 +49,7 @@ namespace ServiceLayer.CloudStorageProviders
 
             return authResult.AccessToken;
         }
-        private async Task ExpandRecursivelyAsync(IDriveItemRequestBuilder driveItemRequest)
-        {
-            var driveItem = await driveItemRequest.Request().Expand("children").GetAsync();
-
-            // Expand children 
-            if (driveItem.Folder != null && driveItem.File == null)
-            {
-                foreach (DriveItem childItem in driveItem.Children.CurrentPage)
-                {
-                    var requestableChildItem = graphClient.Drive.Items[childItem.Id];
-                    await this.ExpandRecursivelyAsync(requestableChildItem);
-                }
-            }
-
-        }
+        
 
 
         // Public methods
