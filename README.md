@@ -1,3 +1,3 @@
 # OneDriveWinBrowser
 
-Small app where I was playing around with creating a small file/folder explorer which integrates with OneDrive and their MS Graph API 
+Small prototype WPF app which integrates with OneDrive and MS Graph API to show and manipulate a filesystem structure
